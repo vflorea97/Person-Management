@@ -24,6 +24,11 @@ public class PersoanaService {
         persoane.forEach(b-> System.out.println(b));
     }
 
+    public List<Persoana> getAllPersoane(){
+        List<Persoana> persoanas = persoanaRepository.findAll();
+        return persoanas;
+    }
+
     public void add(Persoana persoana) throws ExceptiePersoanaExistenta {
         Optional<Persoana> pers = persoanaRepository.findByEmail(persoana.getEmail());
         if(pers.equals(Optional.empty())){
@@ -55,8 +60,35 @@ public class PersoanaService {
         }
     }
 
-    public List<Persoana> getNumeDeFamilieCuA(String nume){
-        return persoanaRepository.getNumeDeFamilieCuA("X").get();
+    public List<Persoana> getNumeDeFamilieCuA(String nume) throws ExceptiePersoanaNeexistenta{
+        List<Persoana> persoane = persoanaRepository.getNumeDeFamilieCuA(nume).get();
+        if (persoane.size() > 0){
+            return persoane;
+        }else {
+            throw new ExceptiePersoanaNeexistenta();
+        }
+    }
+
+    public void remove (String email) throws ExceptiePersoanaNeexistenta {
+        Optional<Persoana> persoana = persoanaRepository.findByEmail(email);
+        if (persoana.isPresent()){
+            persoanaRepository.removePersoanaByEmail(email);
+            System.out.println("Ai ster o persoana cu succes");
+        }else {
+            throw new ExceptiePersoanaNeexistenta();
+        }
+    }
+    public void updateAnNastere(int anNastere, String email) {
+        Optional<Persoana> persoana = persoanaRepository.findByEmail(email);
+        if (!persoana.isEmpty()){
+            persoanaRepository.updatePersonByEmailUpdateAn(anNastere, email);
+        }
+    }
+    public void verificareMail(String email) throws ExceptiePersoanaNeexistenta {
+        Optional<Persoana> persoana = persoanaRepository.findByEmail(email);
+        if (persoana.isEmpty()){
+            throw new ExceptiePersoanaNeexistenta();
+        }
     }
 
 }

@@ -31,8 +31,8 @@ public class PersoanaService {
 
     public void add(Persoana persoana) throws ExceptiePersoanaExistenta {
         Optional<Persoana> pers = persoanaRepository.findByEmail(persoana.getEmail());
-        if(pers.equals(Optional.empty())){
-            persoanaRepository.save(persoana);
+        if(pers.isEmpty()){
+            persoanaRepository.saveAndFlush(persoana);
         }else{
             throw  new ExceptiePersoanaExistenta();
         }

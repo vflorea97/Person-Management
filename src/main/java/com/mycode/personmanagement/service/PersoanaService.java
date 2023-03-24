@@ -3,10 +3,13 @@ package com.mycode.personmanagement.service;
 import com.mycode.personmanagement.Exceptii.ExceptiePersoanaExistenta;
 import com.mycode.personmanagement.Exceptii.ExceptiePersoanaNecorespunzatoare;
 import com.mycode.personmanagement.Exceptii.ExceptiePersoanaNeexistenta;
+import com.mycode.personmanagement.dto.PersonDTO;
 import com.mycode.personmanagement.model.Persoana;
 import com.mycode.personmanagement.repository.PersoanaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,10 +32,19 @@ public class PersoanaService {
         return persoanas;
     }
 
+    public Optional<Persoana> getPersoanaByEmail(String email) throws ExceptiePersoanaNeexistenta  {
+        Optional<Persoana> persoana = persoanaRepository.findByEmail(email);
+        if (persoana.isPresent()){
+            return persoana;
+        }else {
+            throw new ExceptiePersoanaNeexistenta();
+        }
+    }
+
     public void add(Persoana persoana) throws ExceptiePersoanaExistenta {
         Optional<Persoana> pers = persoanaRepository.findByEmail(persoana.getEmail());
-        if(pers.equals(Optional.empty())){
-            persoanaRepository.save(persoana);
+        if(pers.isEmpty()){
+            persoanaRepository.saveAndFlush(persoana);
         }else{
             throw  new ExceptiePersoanaExistenta();
         }
@@ -78,12 +90,18 @@ public class PersoanaService {
             throw new ExceptiePersoanaNeexistenta();
         }
     }
-    public void updateAnNastere(int anNastere, String email) {
+
+    @Transactional
+    @Modifying
+    public void updateAnNastere(int anNastere, String email) throws ExceptiePersoanaNeexistenta {
         Optional<Persoana> persoana = persoanaRepository.findByEmail(email);
-        if (!persoana.isEmpty()){
+        if (persoana.isPresent()) {
             persoanaRepository.updatePersonByEmailUpdateAn(anNastere, email);
+        } else {
+            throw new ExceptiePersoanaNeexistenta();
         }
     }
+
     public void verificareMail(String email) throws ExceptiePersoanaNeexistenta {
         Optional<Persoana> persoana = persoanaRepository.findByEmail(email);
         if (persoana.isEmpty()){
@@ -91,4 +109,26 @@ public class PersoanaService {
         }
     }
 
+    public void updatePersoana(PersonDTO personDTO) throws ExceptiePersoanaNeexistenta {
+        Optional<Persoana> persoana = persoanaRepository.findById(personDTO.getId());
+        if (persoana.isPresent()) {
+            Persoana p = persoana.get();
+
+            if (!personDTO.getNume().equals("")) {
+                p.setNume(personDTO.getNume());
+            }
+            if (personDTO.getInaltime() != 0) {
+                p.setInaltime(personDTO.getInaltime());
+            }
+            if (!personDTO.getEmail().equals("")) {
+                p.setEmail(personDTO.getEmail());
+            }
+            if (personDTO.getGreutate() != 0) {
+                p.setGreutate(personDTO.getGreutate());
+            }
+            persoanaRepository.saveAndFlush(p);
+        } else {
+            throw new ExceptiePersoanaNeexistenta();
+        }
+    }
 }

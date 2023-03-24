@@ -16,7 +16,7 @@ public class PersonManagementApplication {
 	@Bean
 	CommandLineRunner commandLineRunner(View view) {
 		return args -> {
-			view.play();
+//			view.play();
 		};
 	}
 }

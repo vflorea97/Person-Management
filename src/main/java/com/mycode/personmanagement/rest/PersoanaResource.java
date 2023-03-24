@@ -1,24 +1,24 @@
 package com.mycode.personmanagement.rest;
 
+import com.mycode.personmanagement.dto.PersonDTO;
 import com.mycode.personmanagement.model.Persoana;
 import com.mycode.personmanagement.service.PersoanaService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
 @Slf4j
 @RequestMapping("api/v1/persoane")
-public class persoanaResource {
+public class PersoanaResource {
 
     private PersoanaService persoanaService;
 
-    public persoanaResource(PersoanaService persoanaService){
+    public PersoanaResource(PersoanaService persoanaService){
         this.persoanaService = persoanaService;
     }
 
@@ -55,6 +55,28 @@ public class persoanaResource {
         log.info("REST request to get all persoane nascute dupa 2000 si cu inaltime peste 1.50");
         List<Persoana> persoanas = persoanaService.getPersoaneCuVarstaInaltimeaPeste(2000,1.50);
         return new ResponseEntity<>(persoanas, HttpStatus.OK);
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<Persoana> addPersona (@Valid @RequestBody Persoana persoana) {
+
+        log.info("Rest api to add a new magain {}", persoana);
+        this.persoanaService.add(persoana);
+        return new ResponseEntity<>(persoana, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/remove")
+    public ResponseEntity<String> removePersoana( @RequestParam String email){
+        log.info("REST request to remove one student");
+        persoanaService.remove(email);
+        return new ResponseEntity<>("Ai sters cu succes o persoana", HttpStatus.OK);
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<String> updateStudent(@Valid @RequestBody PersonDTO personDTO){
+        log.info("REST request to update persoana{}", personDTO);
+        persoanaService.updatePersoana(personDTO);
+        return new ResponseEntity<>("Ai updata atributul cu succes", HttpStatus.OK);
     }
 
 }

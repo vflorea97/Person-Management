@@ -13,8 +13,8 @@ public class PersonDTO {
 
     @NotNull
     private Long id;
-    private String nume;
-    private double inaltime;
-    private String email;
-    private double greutate;
+    private String nume = "";
+    private double inaltime = 0;
+    private String email = "";
+    private double greutate = 0;
 }

@@ -32,6 +32,15 @@ public class PersoanaService {
         return persoanas;
     }
 
+    public Optional<Persoana> getPersoanaByEmail(String email) throws ExceptiePersoanaNeexistenta  {
+        Optional<Persoana> persoana = persoanaRepository.findByEmail(email);
+        if (persoana.isPresent()){
+            return persoana;
+        }else {
+            throw new ExceptiePersoanaNeexistenta();
+        }
+    }
+
     public void add(Persoana persoana) throws ExceptiePersoanaExistenta {
         Optional<Persoana> pers = persoanaRepository.findByEmail(persoana.getEmail());
         if(pers.isEmpty()){
